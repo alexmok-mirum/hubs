@@ -143,15 +143,19 @@ export function HomePage() {
           <Column grow padding className={styles.rooms}>
             <MediaGrid center>
               {sortedPublicRooms.map(room => {
-                return (
-                  <MediaTile
-                    key={room.id}
-                    entry={room}
-                    processThumbnailUrl={(entry, width, height) =>
-                      scaledThumbnailUrlFor(entry.images.preview.url, width, height)
-                    }
-                  />
-                );
+                // Add overflow handle checking
+                console.log((room.lobby_count + room.member_count) < room.room_size);
+                if((room.lobby_count + room.member_count) < room.room_size){
+                    return (
+                      <MediaTile
+                        key={room.id}
+                        entry={room}
+                        processThumbnailUrl={(entry, width, height) =>
+                          scaledThumbnailUrlFor(entry.images.preview.url, width, height)
+                        }
+                      />
+                    );
+                  }
               })}
             </MediaGrid>
           </Column>

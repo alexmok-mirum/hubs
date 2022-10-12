@@ -593,7 +593,7 @@ function handleHubChannelJoined(entryManager, hubChannel, messageDispatch, data)
       console.log("Loading environment and connecting to dialog servers");
 
       updateEnvironmentForHub(hub, entryManager);
-
+      
       // Disconnect in case this is a re-entry
       APP.dialog.disconnect();
       APP.dialog.connect({
@@ -623,6 +623,8 @@ function handleHubChannelJoined(entryManager, hubChannel, messageDispatch, data)
         .catch(connectError => {
           onConnectionError(entryManager, connectError);
         });
+
+        injectScripts();
     };
 
     window.APP.hub = hub;
@@ -643,6 +645,35 @@ function handleHubChannelJoined(entryManager, hubChannel, messageDispatch, data)
         }
       });
     }
+
+    function injectScripts(){                          
+  		//get the current hub_id and construct a url
+  		const myHub = hub.hub_id;
+  		const url = "http://mirummre.eastasia.cloudapp.azure.com:3997/injectScripts?hubid="+ myHub;
+
+ 		//fetch the url with a get method which will return scripts to inject
+  		fetch(url, {
+    		method: 'get'
+  		})
+  		.then(function(body){   
+    			return body.text(); 
+  			}).then(function(data) {
+    			var myUrls = data.split(",");
+    			var myBody = document.querySelector("body");
+    			for(var items of myUrls) {
+       				if(items == "noUrls"){
+         				Break; 
+       				}
+       				//inject some scripts based on the returned array of urls
+       				var newScript = document.createElement("script");
+       				newScript.type = 'text/javascript';
+       				var srcAt = document.createAttribute('src');
+       				srcAt.value = items;
+       				newScript.setAttributeNode(srcAt);
+       				myBody.appendChild(newScript);
+    			}
+  			});
+ 		}
   })();
 }
 
